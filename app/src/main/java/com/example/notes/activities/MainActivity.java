@@ -1,11 +1,20 @@
-package com.example.notes;
+package com.example.notes.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+
+import com.example.notes.R;
+
+import com.example.notes.database.NotesDatabase;
+import com.example.notes.entities.Note;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     public static final int REQUEST_CODE_ADD_NOTE=1;
@@ -24,5 +33,24 @@ public class MainActivity extends AppCompatActivity {
                 );
             }
         });
+        getNotes();
+
+    }
+    private void getNotes(){
+        class GetNotesTask extends AsyncTask<Void,Void, List<Note>>{
+            @Override
+            protected List<Note> doInBackground(Void... voids) {
+                return NotesDatabase
+                        .getNotesDatabase(getApplicationContext())
+                        .noteDao().getAllNotes();
+            }
+
+            @Override
+            protected void onPostExecute(List<Note> notes) {
+                super.onPostExecute(notes);
+                Log.d("MY_NOtes",notes.toString());
+            }
+        }
+        new GetNotesTask().execute();
     }
 }
